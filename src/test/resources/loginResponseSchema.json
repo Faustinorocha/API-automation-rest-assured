@@ -1,0 +1,9 @@
+{
+  "type": "object",
+  "properties": {
+    "code":     { "type": "number" },
+    "type":     { "type": "string"  },
+    "message":  { "type": "string" , "pattern": "^logged in user session:" }
+  },
+  "required": ["code", "type", "message"]
+}
