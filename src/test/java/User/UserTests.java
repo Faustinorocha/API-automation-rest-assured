@@ -51,7 +51,10 @@ public class UserTests {
 
     @BeforeEach
     void setRequest() {
-        request = given()
+        request = given().config(
+                RestAssured.config()
+                        .logConfig(
+                                logConfig().enableLoggingOfRequestAndResponseIfValidationFails()))
                 .header("api-key", "special-key")
                 .contentType(ContentType.JSON);
 
@@ -107,7 +110,7 @@ public class UserTests {
 
     @Test
     @Order(4)
-    public void DeleteUser_UserExists_Return200() {
+    public void DeleteUser_UserExists_ReturnOk() {
 
         request
                 .when()
@@ -116,6 +119,7 @@ public class UserTests {
                 .assertThat()
                 .statusCode(200)
                 .and().time(lessThan(2000l))
-                .and().body(matchesJsonSchemaInClasspath("deleteUserSchema.json"));
+                .and().body(matchesJsonSchemaInClasspath("deleteUserSchema.json"))
+                .log();
     }
 }
