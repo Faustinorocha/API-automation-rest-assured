@@ -8,7 +8,6 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
 
-import org.hamcrest.Matcher;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,7 +26,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class UserTests {
+public class UserTestsValid {
     public static User user;
 
     public static Faker faker;
@@ -123,19 +122,5 @@ public class UserTests {
                 .and().body(matchesJsonSchemaInClasspath("deleteUserSchema.json"))
                 .log();
     }
-    @Test
-    public void CreateNewUser_WithInvalidBody_ReturnBadRequest() {
 
-        Response response = request
-                .body("teste")
-                .when()
-                .post("/user")
-                .then()
-                .extract().response();
-        Assertions.assertNotNull(response);
-        Assertions.assertEquals(400, response.statusCode());
-        Assertions.assertEquals(true, response.getBody().asPrettyString().contains("unknown"));
-        Assertions.assertEquals(3, response.body().jsonPath().getMap("$").size());
-
-    }
 }
