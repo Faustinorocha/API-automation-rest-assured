@@ -1,4 +1,4 @@
-package Pets;
+package tests;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -21,6 +21,7 @@ public class PetsTests {
         RestAssured.baseURI = "https://petstore.swagger.io/v2";
 
     }
+
     @BeforeEach
     void setRequest() {
         request = given().config(

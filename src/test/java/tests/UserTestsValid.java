@@ -1,5 +1,8 @@
-package User;
-import Entities.User;
+package tests;
+
+import factories.UserFactory;
+import models.User;
+import base.BaseTest;
 import com.github.javafaker.Faker;
 import io.restassured.RestAssured;
 
@@ -8,13 +11,16 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import services.UserService;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.config.LogConfig.logConfig;
@@ -25,81 +31,57 @@ import static org.hamcrest.core.Is.isA;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class UserTestsValid {
-    public static User user;
+public class UserTestsValid extends BaseTest {
 
-    public static Faker faker;
-
-    public static RequestSpecification request;
-
-    @BeforeAll
-    public static void setup() {
-        RestAssured.baseURI = "https://petstore.swagger.io/v2";
-
-        faker = new Faker();
-
-        user = new User(
-                faker.name().username(),
-                faker.name().firstName(),
-                faker.name().lastName(),
-                faker.internet().emailAddress(),
-                faker.internet().password(8, 10),
-                faker.phoneNumber().toString()
-                );
-    }
-
-    @BeforeEach
-    void setRequest() {
-        request = given().config(
-                RestAssured.config()
-                        .logConfig(
-                                logConfig().enableLoggingOfRequestAndResponseIfValidationFails()))
-                .header("api-key", "special-key")
-                .contentType(ContentType.JSON);
-
-    }
 
     @Test
-    @Order(1)
     public void CreateNewUser_WithValidData_ReturnOk() {
 
-        request
-                .body(user)
-                .when()
-                .post("/user")
+        User user = UserFactory.createUser();
+
+        UserService.createUser(user);
+        Response response = UserService.createUser(user);
+
+        response
                 .then()
-                .assertThat().statusCode(200).and()
+                .statusCode(200)
                 .body("code", equalTo(200))
                 .body("type", equalTo("unknown"))
                 .body("message", isA(String.class))
                 .body("size()", equalTo(3));
 
     }
+
     @Test
-    @Order(2)
     public void GetLogin_ValidUser_ReturnOk() {
 
-        request
-                .param("username", "nedafsdfasdto123@qa.com")
-                .param("password", "Senha@1235555")
-                .when()
-                .get("/user/login")
+        User user = UserFactory.createUser();
+
+        UserService.createUser(user);
+
+        Response response = UserService.login(
+                user.getUsername(),
+                user.getPassword()
+        );
+
+        response
                 .then()
-                .assertThat()
                 .statusCode(200)
                 .and().time(lessThan(2000L))
                 .and().body(matchesJsonSchemaInClasspath("loginResponseSchema.json"));
 
-
     }
+
     @Test
-    @Order(3)
     public void GetUserByUsername_userIsValid_ReturnOk() {
 
-        request
-                .when()
-                .get("/user/" + user.getUsername())
+        User user = UserFactory.createUser();
+
+        UserService.createUser(user);
+
+        Response response = UserService.getUser(user.getUsername());
+
+        response
                 .then()
                 .assertThat()
                 .statusCode(200)
@@ -109,12 +91,15 @@ public class UserTestsValid {
     }
 
     @Test
-    @Order(4)
     public void DeleteUser_UserExists_ReturnOk() {
 
-        request
-                .when()
-                .delete("/user/" + user.getUsername())
+        User user = UserFactory.createUser();
+
+        UserService.createUser(user);
+
+        Response response = UserService.deleteUser(user.getUsername());
+
+        response
                 .then()
                 .assertThat()
                 .statusCode(200)
