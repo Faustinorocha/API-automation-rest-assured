@@ -34,12 +34,22 @@ import static org.hamcrest.core.IsEqual.equalTo;
 public class UserTestsValid extends BaseTest {
 
 
+    private User createAndPersistUser() {
+
+        User user = UserFactory.createUser();
+
+        UserService.createUser(user);
+
+        return user;
+    }
+
     @Test
     public void CreateNewUser_WithValidData_ReturnOk() {
 
         User user = UserFactory.createUser();
 
         UserService.createUser(user);
+
         Response response = UserService.createUser(user);
 
         response
@@ -55,9 +65,8 @@ public class UserTestsValid extends BaseTest {
     @Test
     public void GetLogin_ValidUser_ReturnOk() {
 
-        User user = UserFactory.createUser();
+        User user = createAndPersistUser();
 
-        UserService.createUser(user);
 
         Response response = UserService.login(
                 user.getUsername(),
@@ -75,9 +84,7 @@ public class UserTestsValid extends BaseTest {
     @Test
     public void GetUserByUsername_userIsValid_ReturnOk() {
 
-        User user = UserFactory.createUser();
-
-        UserService.createUser(user);
+        User user = createAndPersistUser();
 
         Response response = UserService.getUser(user.getUsername());
 
@@ -93,9 +100,7 @@ public class UserTestsValid extends BaseTest {
     @Test
     public void DeleteUser_UserExists_ReturnOk() {
 
-        User user = UserFactory.createUser();
-
-        UserService.createUser(user);
+        User user = createAndPersistUser();;
 
         Response response = UserService.deleteUser(user.getUsername());
 
